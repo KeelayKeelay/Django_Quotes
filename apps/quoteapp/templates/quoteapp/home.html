@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <a href="{% url 'login:logout' %}">Logout</a>
+  <h2>Welcome {{user.name}}!</h2>
+  <div style="width:550px; height:350px; overflow:scroll;">
+    <h3>Quotes</h3>
+    {% for quote in quotes %}
+    <form action="{% url 'quoteapp:favadd' quote_id=quote.id %}" method="post">
+      {% csrf_token %}
+      <h4>{{quote.quoted_user}}: {{quote.content}}</h4>
+      <p>Posted by
+        <a href="{% url 'quoteapp:profile' user_id=quote.user.id %}">{{quote.user.alias}}</a>
+        <input type="submit" value="Add to My List">
+      </p>
+    </form>
+    {% endfor %}
+  </div>
+  <br><br>
+  <div>
+    <h3>Your Favorites</h3>
+    {% for quote in user.quotes.all %}
+    <form action="{% url 'quoteapp:favrem' quote_id=quote.id %}" method="post">
+      {% csrf_token %}
+      <p>{{quote.quoted_user}}: {{quote.content}}</p>
+      <p>Posted by
+        <a href="{% url 'quoteapp:profile' user_id=quote.user.id %}">{{quote.user.alias}}</a>
+        <input type="submit" value="Remove from My List">
+      </p>
+    </form>
+    {% endfor %}
+  </div>
+  <h4>Create Your Own!</h4>
+  <form action="{% url 'quoteapp:process_quote' %}" method="post">
+    {% csrf_token %}
+    <label for="quoted_user">Quoted By:</label>
+    <input type="text" name="quoted_user" value="">
+    <label for="content">Message:</label>
+    <textarea name="content"></textarea>
+    <input type="submit">
+
+    {% if messages %}
+    {% for message in messages %}
+    <h3>{{ message }}</h3>
+    {% endfor %}
+  {% endif %}
+  </form>
+</body>
+
+</html>
